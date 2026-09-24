@@ -1,1 +1,33 @@
+bin/module-info.class
+
+
+# --- Java y Compilación ---
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+/bin/
+/target/
+
+# --- Eclipse ---
+.metadata/
+.project
+.classpath
+.settings/
+*.launch
+.externalToolBuilders/
+
+# --- Sistemas Operativos ---
+.DS_Store
+Thumbs.db
+.idea/.gitignore
+.idea/.name
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+/.idea/
+/out/
+*/.idea/
+*/out/
 /build/
