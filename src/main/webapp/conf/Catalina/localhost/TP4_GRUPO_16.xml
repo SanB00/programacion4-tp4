@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Context docBase="C:\Users\Norka Natalia\Documents\git\programacion4-tp4\src\main\webapp">
-  <Resources cacheMaxSize="10240">
-    <PreResources base="C:/Users/Norka Natalia/Documents/git/programacion4-tp4/classes/production/programacion4-tp4" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
-  </Resources>
-</Context>
