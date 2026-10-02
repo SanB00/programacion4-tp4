@@ -129,4 +129,18 @@ public class SeguroDao {
 
 	}
 
+	public int getProximoId() {
+		String query = "select ifnull(max(idSeguro),0)+1 from seguros";
+		try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+				Statement s = cn.createStatement();
+				ResultSet rs = s.executeQuery(query)) {
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return 1;
+	}
+
 }
