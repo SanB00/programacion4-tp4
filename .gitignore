@@ -31,3 +31,23 @@ Thumbs.db
 */.idea/
 */out/
 /build/
+/src/main/webapp/temp/
+/src/main/webapp/conf/
+/src/main/webapp/logs/
+src/main/webapp/logs/catalina.2026-09-28.log
+src/main/webapp/logs/localhost_access_log.2026-09-28.txt
+src/main/webapp/work/Catalina/localhost/TP4_GRUPO_16/SESSIONS.ser
+src/main/webapp/work/Catalina/localhost/TP4_GRUPO_16/org/apache/jsp/Ejercicio1_jsp.java
+
+
+
+# IDE specific configurations
+.settings/
+.smarttomcat/
+.idea/
+*.iml
+
+# Tomcat local working directories
+work/
+build/
+bin/
