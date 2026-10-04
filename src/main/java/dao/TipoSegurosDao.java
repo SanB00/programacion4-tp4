@@ -17,7 +17,8 @@ public class TipoSegurosDao {
 
 	public TipoSegurosDao() {
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			// Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -101,27 +102,21 @@ public class TipoSegurosDao {
 		return tipoSeguro;
 	}
 
-	public ArrayList<TipoSeguros> getTipoSeguros() {
-		ArrayList<TipoSeguros> listaTipoSeguros = new ArrayList<TipoSeguros>();
+	// Quitamos el try-catch de aquí para que el error suba al Servlet
+	public ArrayList<TipoSeguros> getTipoSeguros() throws java.sql.SQLException {
+		ArrayList<TipoSeguros> listaTipoSeguros = new ArrayList<>();
 		String query = "SELECT * FROM tipoSeguros";
-		Connection cn = null;
 
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
+		try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+				Statement st = cn.createStatement();
+				ResultSet rs = st.executeQuery(query)) {
 
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			Statement st = cn.createStatement();
-			ResultSet rs = st.executeQuery(query);
 			while (rs.next()) {
 				TipoSeguros ts = new TipoSeguros();
 				ts.setIdTipo(rs.getInt("idTipo"));
 				ts.setDescripcion(rs.getString("descripcion"));
-
 				listaTipoSeguros.add(ts);
 			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return listaTipoSeguros;
 	}

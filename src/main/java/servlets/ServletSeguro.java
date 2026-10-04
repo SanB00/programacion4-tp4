@@ -2,6 +2,7 @@ package servlets;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.ServletException;
@@ -24,29 +25,37 @@ public class ServletSeguro extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
-		String param = request.getParameter("Param");
+		try {
+			request.setCharacterEncoding("UTF-8");
+			String param = request.getParameter("Param");
 
-		if ("agregar".equals(param)) {
-			mostrarAgregar(request, response);
-		} else {
-			response.sendRedirect("Inicio.jsp");
+			if ("agregar".equals(param)) {
+				mostrarAgregar(request, response);
+			} else {
+				response.sendRedirect("Inicio.jsp");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
+		try {
+			request.setCharacterEncoding("UTF-8");
 
-		if (request.getParameter("btnAceptar") != null) {
-			agregarSeguro(request, response);
-		} else {
-			doGet(request, response);
+			if (request.getParameter("btnAceptar") != null) {
+				agregarSeguro(request, response);
+			} else {
+				doGet(request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	private void mostrarAgregar(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, SQLException {
 		ArrayList<TipoSeguros> listaTipos = tipoDao.getTipoSeguros();
 		request.setAttribute("listaTipos", listaTipos);
 		request.setAttribute("proximoId", seguroDao.getProximoId());
@@ -54,7 +63,7 @@ public class ServletSeguro extends HttpServlet {
 	}
 
 	private void agregarSeguro(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+			throws ServletException, IOException, SQLException {
 		String descripcion = request.getParameter("txtDescripcion");
 		String idTipoStr = request.getParameter("ddlTipo");
 		String contratacionStr = request.getParameter("txtCostoContratacion");
