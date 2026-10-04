@@ -107,6 +107,8 @@ public class TipoSegurosDao {
 		Connection cn = null;
 
 		try {
+			Class.forName("com.mysql.jdbc.Driver");
+
 			cn = DriverManager.getConnection(host + dbname, user, pass);
 			Statement st = cn.createStatement();
 			ResultSet rs = st.executeQuery(query);
