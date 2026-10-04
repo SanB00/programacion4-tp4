@@ -16,12 +16,12 @@
 	<%
 	//obtenemos lista de tipos de seguros para mostrar en ddl
 	ArrayList<TipoSeguros> listaTipoSeguros = null;
-	ArrayList<Seguro> ls = null;
+	ArrayList<Seguro> listaSeguros = null;
 	if (request.getAttribute("listaTipoSeguros") != null) {
 		listaTipoSeguros = (ArrayList<TipoSeguros>) request.getAttribute("listaTipoSeguros");
 	}
-	if (request.getAttribute("ls") != null) {
-		ls = (ArrayList<Seguro>) request.getAttribute("ls");
+	if (request.getAttribute("listaSeguros") != null) {
+		listaSeguros = (ArrayList<Seguro>) request.getAttribute("listaSeguros");
 	}
 	%>
 	<h1>Listar seguros</h1>
@@ -53,8 +53,8 @@
 				<th>Costo Asegurado</th>
 			</tr>
 			<%
-			if (ls != null)
-				for (Seguro s : ls) {
+			if (listaSeguros != null)
+				for (Seguro s : listaSeguros) {
 			%>
 			<tr>
 				<td><%=s.getIdSeguro()%></td>
