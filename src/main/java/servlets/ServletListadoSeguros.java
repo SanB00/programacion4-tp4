@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.SeguroDao;
+import dao.TipoSegurosDao;
 import dominio.Seguro;
+import dominio.TipoSeguros;
 
 /**
  * Servlet implementation class ServletListadoSeguros
@@ -34,14 +36,29 @@ public class ServletListadoSeguros extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		if (request.getParameter("param") != null) {
-			// Cargamos seguros en tabla
-			SeguroDao ds = new SeguroDao();
-			ArrayList<Seguro> ls = ds.getSeguros();
-			request.setAttribute("ls", ls);
+		try {
+			if (request.getParameter("param") != null) {
+				// Cargamos seguros en tabla
+				SeguroDao ds = new SeguroDao();
+				ArrayList<Seguro> ls = ds.getSeguros();
+				request.setAttribute("ls", ls);
+				ArrayList<TipoSeguros> listaTipoSeguros = new TipoSegurosDao().getTipoSeguros();
+				request.setAttribute("listaTipoSeguros", listaTipoSeguros);
+			}
+			if (request.getParameter("btnFiltrar") != null) {
+				int idTipo = Integer.parseInt(request.getParameter("ddlTipoSeguro"));
+				ArrayList<Seguro> ls = new SeguroDao().obtenerPorTipoSeguro(idTipo);
+				request.setAttribute("ls", ls);
+
+				ArrayList<TipoSeguros> listaTipoSeguros = new TipoSegurosDao().getTipoSeguros();
+				request.setAttribute("listaTipoSeguros", listaTipoSeguros);
+			}
+
 			RequestDispatcher rd = request.getRequestDispatcher("/ListarSeguros.jsp");
 			rd.forward(request, response);
+		} catch (Exception e) {
+			request.setAttribute("errorMensaje", "Error: " + e);
+			e.printStackTrace();
 		}
 	}
 

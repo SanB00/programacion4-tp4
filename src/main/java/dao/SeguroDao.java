@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -15,6 +16,9 @@ public class SeguroDao {
 	private String user = "root";
 	private String pass = "root";
 	private String dbname = "SegurosGroup";
+	private final String QUERY_PRINCIPAL = "SELECT * \r\n" + ",(\r\n"
+			+ "	SELECT TS.descripcion FROM segurosgroup.tiposeguros TS\r\n" + "    WHERE TS.idTipo = S.idTipo\r\n"
+			+ ") as descripcionSeguro\r\n" + "FROM segurosgroup.seguros S\r\n" + "\r\n";
 
 	// constructor
 	public SeguroDao() {
@@ -25,41 +29,30 @@ public class SeguroDao {
 		}
 	}
 
-	public int agregarSeguro(Seguro seg) {
+	public int agregarSeguro(Seguro seg) throws SQLException {
 		String query = "insert into seguros(descripcion,idTipo,costoContratacion,costoAsegurado) values(?,?,?,?)";
 		Connection cn = null;
 		int filas = 0;
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement ps = (PreparedStatement) cn.prepareStatement(query);
-			ps.setString(1, seg.getDescripcion());
-			ps.setInt(2, seg.getIdTipo());
-			ps.setBigDecimal(3, seg.getCostoContratacion());
-			ps.setBigDecimal(4, seg.getCostoAsegurado());
-			filas = ps.executeUpdate();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-
-			return 0;
-		}
+		cn = DriverManager.getConnection(host + dbname, user, pass);
+		PreparedStatement ps = (PreparedStatement) cn.prepareStatement(query);
+		ps.setString(1, seg.getDescripcion());
+		ps.setInt(2, seg.getIdTipo());
+		ps.setBigDecimal(3, seg.getCostoContratacion());
+		ps.setBigDecimal(4, seg.getCostoAsegurado());
+		filas = ps.executeUpdate();
 		return filas;
 
 	}
 
-	public int eliminarSeguro(int id) {
+	public int eliminarSeguro(int id) throws SQLException {
 		String query = "Delete from seguros where idSeguro=?";
 		Connection cn = null;
 		int filas = 0;
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement ps = cn.prepareStatement(query);
-			ps.setInt(1, id);
-			filas = ps.executeUpdate();
+		cn = DriverManager.getConnection(host + dbname, user, pass);
+		PreparedStatement ps = cn.prepareStatement(query);
+		ps.setInt(1, id);
+		filas = ps.executeUpdate();
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return 0;
-		}
 		return filas;
 
 	}
@@ -85,51 +78,32 @@ public class SeguroDao {
 		return filas;
 	}
 
-	public Seguro getSeguro(int id) {
-		String query = "select * from seguros where idSeguro=?";
+	public Seguro getSeguro(int id) throws SQLException {
+		// String query = "select * from seguros where idSeguro=?";
+		String query = this.QUERY_PRINCIPAL + " where idSeguro=?";
+
 		Connection cn = null;
 		Seguro seg = new Seguro();
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement ps = cn.prepareStatement(query);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				seg.setIdSeguro(rs.getInt("idSeguro"));
-				seg.setDescripcion(rs.getString("descripcion"));
-				seg.setIdTipo(rs.getInt("idTipo"));
-				seg.setCostoContratacion(rs.getBigDecimal("costoContratacion"));
-				seg.setCostoAsegurado(rs.getBigDecimal("costoAsegurado"));
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return seg;
-
+		cn = DriverManager.getConnection(host + dbname, user, pass);
+		PreparedStatement ps = cn.prepareStatement(query);
+		ps.setInt(1, id);
+		ResultSet rs = ps.executeQuery();
+		if (rs.next())
+			return this.getObjectFromRS(rs);
+		return null;
 	}
 
-	public ArrayList<Seguro> getSeguros() {
+	public ArrayList<Seguro> getSeguros() throws SQLException {
 		ArrayList<Seguro> lseg = new ArrayList<Seguro>();
-		String query = "select * from seguros";
+		String query = this.QUERY_PRINCIPAL; // String query = "select * from seguros";
 		Connection cn = null;
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			Statement s = cn.createStatement();
-			ResultSet rs = s.executeQuery(query);
-			while (rs.next()) {
-				Seguro seg = new Seguro();
-				seg.setIdSeguro(rs.getInt("idSeguro"));
-				seg.setDescripcion(rs.getString("descripcion"));
-				seg.setIdTipo(rs.getInt("idTipo"));
-				seg.setCostoAsegurado(rs.getBigDecimal("costoAsegurado"));
-				seg.setCostoContratacion(rs.getBigDecimal("costoContratacion"));
-				lseg.add(seg);
-			}
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		cn = DriverManager.getConnection(host + dbname, user, pass);
+		Statement s = cn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next()) {
+			lseg.add(this.getObjectFromRS(rs));
 		}
+
 		return lseg;
 
 	}
@@ -148,4 +122,27 @@ public class SeguroDao {
 		return 1;
 	}
 
+	public ArrayList<Seguro> obtenerPorTipoSeguro(int id) throws SQLException {
+		ArrayList<Seguro> lista = new ArrayList<Seguro>();
+		String query = this.QUERY_PRINCIPAL + " WHERE idTipo = " + id + "\r\n";
+		Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+		Statement s = cn.createStatement();
+		ResultSet rs = s.executeQuery(query);
+		while (rs.next()) {
+			lista.add(this.getObjectFromRS(rs));
+		}
+		return lista;
+
+	}
+
+	public Seguro getObjectFromRS(ResultSet rs) throws SQLException {
+		Seguro seg = new Seguro();
+		seg.setIdSeguro(rs.getInt("idSeguro"));
+		seg.setDescripcion(rs.getString("descripcion"));
+		seg.setIdTipo(rs.getInt("idTipo"));
+		seg.setCostoAsegurado(rs.getBigDecimal("costoAsegurado"));
+		seg.setCostoContratacion(rs.getBigDecimal("costoContratacion"));
+		seg.setDescripcionTipoSeguro(rs.getString("descripcionSeguro"));
+		return seg;
+	}
 }

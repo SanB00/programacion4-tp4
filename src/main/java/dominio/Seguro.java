@@ -8,6 +8,7 @@ public class Seguro {
 	private int idTipo;
 	private BigDecimal costoContratacion;
 	private BigDecimal costoAsegurado;
+	private String descripcionTipoSeguro;
 
 	public Seguro() {
 	}
@@ -68,9 +69,18 @@ public class Seguro {
 		this.costoAsegurado = costoAsegurado;
 	}
 
+	public String getDescripcionTipoSeguro() {
+		return descripcionTipoSeguro;
+	}
+
+	public void setDescripcionTipoSeguro(String descripcionTipoSeguro) {
+		this.descripcionTipoSeguro = descripcionTipoSeguro;
+	}
+
 	@Override
 	public String toString() {
 		return "Seguro [idSeguro=" + idSeguro + ", descripcion=" + descripcion + ", idTipo=" + idTipo
 				+ ", costoContratacion=" + costoContratacion + ", costoAsegurado=" + costoAsegurado + "]";
 	}
+
 }
