@@ -16,7 +16,6 @@ public class TipoSegurosDao {
 	private String dbname = "SegurosGroup?useUnicode=yes&characterEncoding=UTF-8&useSSL=false";
 
 	public boolean agregarTipoSeguro(TipoSeguros tipoSeguros) {
-
 		String query = "INSERT INTO tipoSeguros (descripcion) VALUES (?)";
 		Connection cn = null;
 		int filas = 0;
@@ -95,11 +94,11 @@ public class TipoSegurosDao {
 
 	public ArrayList<TipoSeguros> getTipoSeguros() {
 		ArrayList<TipoSeguros> listaTipoSeguros = new ArrayList<TipoSeguros>();
-		String query = "SELECT * FROM tipoSeguros";
+		String query = "SELECT * FROM tiposeguros";
 		Connection cn = null;
 
 		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
+			cn = DriverManager.getConnection(host + "segurosgroup", user, pass);
 			Statement st = cn.createStatement();
 			ResultSet rs = st.executeQuery(query);
 			while (rs.next()) {

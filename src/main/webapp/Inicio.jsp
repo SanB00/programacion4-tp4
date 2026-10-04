@@ -7,6 +7,9 @@ pageEncoding="UTF-8"%>
     <title>TP 4</title>
   </head>
   <body>
+  
+      <jsp:include page="Menu.jsp"></jsp:include>
+  
     <h1>Página principal</h1>
 
     <footer>

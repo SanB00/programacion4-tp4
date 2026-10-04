@@ -6,5 +6,5 @@
  */
 module TP4_GRUPO_16 {
 	requires java.sql;
-	// requires servlet.api;
+	requires servlet.api;
 }
