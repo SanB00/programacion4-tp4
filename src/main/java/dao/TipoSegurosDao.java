@@ -15,7 +15,16 @@ public class TipoSegurosDao {
 	private String pass = "root";
 	private String dbname = "SegurosGroup?useUnicode=yes&characterEncoding=UTF-8&useSSL=false";
 
+	public TipoSegurosDao() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public boolean agregarTipoSeguro(TipoSeguros tipoSeguros) {
+
 		String query = "INSERT INTO tipoSeguros (descripcion) VALUES (?)";
 		Connection cn = null;
 		int filas = 0;
@@ -94,11 +103,11 @@ public class TipoSegurosDao {
 
 	public ArrayList<TipoSeguros> getTipoSeguros() {
 		ArrayList<TipoSeguros> listaTipoSeguros = new ArrayList<TipoSeguros>();
-		String query = "SELECT * FROM tiposeguros";
+		String query = "SELECT * FROM tipoSeguros";
 		Connection cn = null;
 
 		try {
-			cn = DriverManager.getConnection(host + "segurosgroup", user, pass);
+			cn = DriverManager.getConnection(host + dbname, user, pass);
 			Statement st = cn.createStatement();
 			ResultSet rs = st.executeQuery(query);
 			while (rs.next()) {

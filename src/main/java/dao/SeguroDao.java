@@ -18,6 +18,11 @@ public class SeguroDao {
 
 	// constructor
 	public SeguroDao() {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public int agregarSeguro(Seguro seg) {
