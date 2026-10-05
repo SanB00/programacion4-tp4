@@ -4,121 +4,85 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
 import dominio.TipoSeguros;
 
 public class TipoSegurosDao {
-	private String host = "jdbc:mysql://localhost:3306/";
-	private String user = "root";
-	private String pass = "root";
-	private String dbname = "SegurosGroup?useUnicode=yes&characterEncoding=UTF-8&useSSL=false";
+    private final String host = "jdbc:mysql://localhost:3306/";
+    private final String user = "root";
+    private final String pass = "root";
+    private final String dbname = "SegurosGroup?useUnicode=true&characterEncoding=UTF-8&useSSL=false";
 
-	public TipoSegurosDao() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			// Class.forName("com.mysql.jc.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+    public TipoSegurosDao() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("No se encontró el driver de MySQL.", e);
+        }
+    }
 
-	public boolean agregarTipoSeguro(TipoSeguros tipoSeguros) {
+    public boolean agregarTipoSeguro(TipoSeguros tipoSeguros) throws SQLException {
+        String query = "INSERT INTO tipoSeguros (descripcion) VALUES (?)";
 
-		String query = "INSERT INTO tipoSeguros (descripcion) VALUES (?)";
-		Connection cn = null;
-		int filas = 0;
+        try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+             PreparedStatement ps = cn.prepareStatement(query)) {
+            ps.setString(1, tipoSeguros.getDescripcion());
+            return ps.executeUpdate() > 0;
+        }
+    }
 
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement pst = cn.prepareStatement(query);
-			pst.setString(1, tipoSeguros.getDescripcion());
+    public boolean eliminarTipoSeguro(int idTipo) throws SQLException {
+        String query = "DELETE FROM tipoSeguros WHERE idTipo = ?";
 
-			filas = pst.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+             PreparedStatement ps = cn.prepareStatement(query)) {
+            ps.setInt(1, idTipo);
+            return ps.executeUpdate() > 0;
+        }
+    }
 
-		return filas > 0;
-	}
+    public boolean modificarTipoSeguro(TipoSeguros tipoSeguros) throws SQLException {
+        String query = "UPDATE tipoSeguros SET descripcion = ? WHERE idTipo = ?";
 
-	public boolean eliminarTipoSeguro(int idTipo) {
+        try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+             PreparedStatement ps = cn.prepareStatement(query)) {
+            ps.setString(1, tipoSeguros.getDescripcion());
+            ps.setInt(2, tipoSeguros.getIdTipo());
+            return ps.executeUpdate() > 0;
+        }
+    }
 
-		String query = "DELETE FROM tipoSeguros WHERE idTipo = ?";
-		Connection cn = null;
-		int filas = 0;
+    public TipoSeguros getTipoSeguro(int idTipo) throws SQLException {
+        String query = "SELECT idTipo, descripcion FROM tipoSeguros WHERE idTipo = ?";
 
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement pst = cn.prepareStatement(query);
-			pst.setInt(1, idTipo);
+        try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+             PreparedStatement ps = cn.prepareStatement(query)) {
+            ps.setInt(1, idTipo);
 
-			filas = pst.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new TipoSeguros(rs.getInt("idTipo"), rs.getString("descripcion"));
+                }
+            }
+        }
+        return null;
+    }
 
-		return filas > 0;
-	}
+    public ArrayList<TipoSeguros> getTipoSeguros() throws SQLException {
+        ArrayList<TipoSeguros> lista = new ArrayList<>();
+        String query = "SELECT idTipo, descripcion FROM tipoSeguros ORDER BY idTipo";
 
-	public boolean modificarTipoSeguro(TipoSeguros tipoSeguros) {
+        try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
+             Statement st = cn.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
 
-		String query = "UPDATE tipoSeguros SET descripcion = ? WHERE idTipo = ?";
-		Connection cn = null;
-		int filas = 0;
-
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement pst = cn.prepareStatement(query);
-			pst.setString(1, tipoSeguros.getDescripcion());
-			pst.setInt(2, tipoSeguros.getIdTipo());
-
-			filas = pst.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return filas > 0;
-	}
-
-	public TipoSeguros getTipoSeguro(int idTipo) {
-		String query = "SELECT * FROM tipoSeguros WHERE idTipo=?";
-		Connection cn = null;
-		TipoSeguros tipoSeguro = new TipoSeguros();
-		try {
-			cn = DriverManager.getConnection(host + dbname, user, pass);
-			PreparedStatement pst = cn.prepareStatement(query);
-			pst.setInt(1, idTipo);
-			ResultSet rs = pst.executeQuery();
-			if (rs.next()) {
-				tipoSeguro.setIdTipo(idTipo);
-				tipoSeguro.setDescripcion(rs.getString("descripcion"));
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return tipoSeguro;
-	}
-
-	// Quitamos el try-catch de aquí para que el error suba al Servlet
-	public ArrayList<TipoSeguros> getTipoSeguros() throws java.sql.SQLException {
-		ArrayList<TipoSeguros> listaTipoSeguros = new ArrayList<>();
-		String query = "SELECT * FROM tipoSeguros";
-
-		try (Connection cn = DriverManager.getConnection(host + dbname, user, pass);
-				Statement st = cn.createStatement();
-				ResultSet rs = st.executeQuery(query)) {
-
-			while (rs.next()) {
-				TipoSeguros ts = new TipoSeguros();
-				ts.setIdTipo(rs.getInt("idTipo"));
-				ts.setDescripcion(rs.getString("descripcion"));
-				listaTipoSeguros.add(ts);
-			}
-		}
-		return listaTipoSeguros;
-	}
-
+            while (rs.next()) {
+                lista.add(new TipoSeguros(rs.getInt("idTipo"), rs.getString("descripcion")));
+            }
+        }
+        return lista;
+    }
 }

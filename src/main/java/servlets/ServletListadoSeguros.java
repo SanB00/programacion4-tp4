@@ -15,58 +15,61 @@ import dao.TipoSegurosDao;
 import dominio.Seguro;
 import dominio.TipoSeguros;
 
-/**
- * Servlet implementation class ServletListadoSeguros
- */
 @WebServlet("/ServletListadoSeguros")
 public class ServletListadoSeguros extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public ServletListadoSeguros() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		ArrayList<Seguro> listaSeguros = new ArrayList<Seguro>();
-		try {
-			if (request.getParameter("param") != null) {
-				// Cargamos seguros en tabla
-				listaSeguros = new SeguroDao().getSeguros();
-			}
-			if (request.getParameter("btnFiltrar") != null) {
-				int idTipo = Integer.parseInt(request.getParameter("ddlTipoSeguro"));
-				listaSeguros = new SeguroDao().obtenerPorTipoSeguro(idTipo);
-			}
-			
-			request.setAttribute("listaSeguros", listaSeguros);
-			ArrayList<TipoSeguros> listaTipoSeguros = new TipoSegurosDao().getTipoSeguros();
-			request.setAttribute("listaTipoSeguros", listaTipoSeguros);
-		} catch (Exception e) {
-			request.setAttribute("errorMensaje", "Error: " + e);
-			e.printStackTrace();
-		} finally {
-			RequestDispatcher rd = request.getRequestDispatcher("/ListarSeguros.jsp");
-			rd.forward(request, response);
-		}
-	}
+        SeguroDao seguroDao = new SeguroDao();
+        TipoSegurosDao tipoDao = new TipoSegurosDao();
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
+        try {
+            ArrayList<Seguro> listaSeguros;
+            String idTipoSeleccionado = request.getParameter("ddlTipoSeguro");
 
+            if (request.getParameter("btnFiltrar") != null) {
+                try {
+                    int idTipo = Integer.parseInt(idTipoSeleccionado);
+                    if (idTipo <= 0) {
+                        throw new NumberFormatException();
+                    }
+                    listaSeguros = seguroDao.obtenerPorTipoSeguro(idTipo);
+                    request.setAttribute("idTipoSeleccionado", idTipo);
+                } catch (NumberFormatException e) {
+                    request.setAttribute("errorMensaje", "Debe seleccionar un tipo de seguro para filtrar.");
+                    listaSeguros = seguroDao.getSeguros();
+                }
+            } else {
+                listaSeguros = seguroDao.getSeguros();
+            }
+
+            ArrayList<TipoSeguros> listaTipoSeguros = tipoDao.getTipoSeguros();
+            request.setAttribute("listaSeguros", listaSeguros);
+            request.setAttribute("listaTipoSeguros", listaTipoSeguros);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMensaje", "No se pudo cargar la información de seguros.");
+            request.setAttribute("listaSeguros", new ArrayList<Seguro>());
+            try {
+                request.setAttribute("listaTipoSeguros", tipoDao.getTipoSeguros());
+            } catch (Exception ex) {
+                request.setAttribute("listaTipoSeguros", new ArrayList<TipoSeguros>());
+            }
+        }
+
+        RequestDispatcher rd = request.getRequestDispatcher("/ListarSeguros.jsp");
+        rd.forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
 }

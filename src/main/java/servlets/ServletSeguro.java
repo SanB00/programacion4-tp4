@@ -18,13 +18,13 @@ import dominio.TipoSeguros;
 
 @WebServlet("/ServletSeguro")
 public class ServletSeguro extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private SeguroDao seguroDao = new SeguroDao();
-	private TipoSegurosDao tipoDao = new TipoSegurosDao();
+    private final SeguroDao seguroDao = new SeguroDao();
+    private final TipoSegurosDao tipoDao = new TipoSegurosDao();
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		try {
 			request.setCharacterEncoding("UTF-8");
 			String param = request.getParameter("Param");
@@ -37,10 +37,10 @@ public class ServletSeguro extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 		try {
 			request.setCharacterEncoding("UTF-8");
 
@@ -52,9 +52,9 @@ public class ServletSeguro extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
-	private void mostrarAgregar(HttpServletRequest request, HttpServletResponse response)
+    private void mostrarAgregar(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, SQLException {
 		ArrayList<TipoSeguros> listaTipos = tipoDao.getTipoSeguros();
 		request.setAttribute("listaTipos", listaTipos);
@@ -62,7 +62,7 @@ public class ServletSeguro extends HttpServlet {
 		request.getRequestDispatcher("AgregarSeguro.jsp").forward(request, response);
 	}
 
-	private void agregarSeguro(HttpServletRequest request, HttpServletResponse response)
+    private void agregarSeguro(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, SQLException {
 		String descripcion = request.getParameter("txtDescripcion");
 		String idTipoStr = request.getParameter("ddlTipo");
@@ -107,17 +107,18 @@ public class ServletSeguro extends HttpServlet {
 		}
 
 		mostrarAgregar(request, response);
-	}
+    }
 
-	private BigDecimal parsearPositivo(String texto) {
-		if (texto == null) {
-			return null;
-		}
-		try {
-			BigDecimal valor = new BigDecimal(texto.trim());
-			return valor.signum() > 0 ? valor : null;
-		} catch (NumberFormatException e) {
-			return null;
-		}
-	}
+    private BigDecimal parsearPositivo(String texto) {
+        if (texto == null || texto.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            BigDecimal valor = new BigDecimal(texto.trim());
+            return valor.signum() > 0 ? valor : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
 }
