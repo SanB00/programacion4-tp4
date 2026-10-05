@@ -17,8 +17,8 @@ public class TipoSegurosDao {
 
 	public TipoSegurosDao() {
 		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			// Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("com.mysql.jdbc.Driver");
+			// Class.forName("com.mysql.jc.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
