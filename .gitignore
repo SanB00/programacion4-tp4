@@ -12,9 +12,9 @@ bin/module-info.class
 
 # --- Eclipse ---
 .metadata/
-.project
-.classpath
-.settings/
+# .project
+# .classpath
+# .settings/
 *.launch
 .externalToolBuilders/
 

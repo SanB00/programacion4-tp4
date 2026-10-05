@@ -7,6 +7,6 @@
 	<display-name>TP4_GRUPO_16</display-name>
 	
 	<welcome-file-list>
-		<welcome-file>Ejercicio1.jsp</welcome-file>
+		<welcome-file>Inicio.jsp</welcome-file>
 	</welcome-file-list>
 </web-app>
